@@ -31,6 +31,11 @@ app.use(require('./src/middlewares/errorHandler'));
 
 const PORT = process.env.PORT || 4000;
 
+app.get('/', (req, res) => {
+  res.send('Welcome to Study Buddy backend url');
+});
+
+
 connectDB()
   .then(() => {
     app.listen(PORT, () => {

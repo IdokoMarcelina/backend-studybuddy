@@ -5,13 +5,13 @@ const {  login, googleCallback, verifyEmailOtp, loginUser, registerWithoutVerify
 const { registerUser } = require('../controllers/authControllers');
 
 
-router.post('/register', registerUser);
-router.post('/signup', registerWithoutVerify);
+router.post('/signup', registerUser);
+// router.post('/signup', registerWithoutVerify);
 router.post('/login', loginUser);
 router.post('/verify-otp', verifyEmailOtp);
 
 
-// ✅ Google login routes
+//  Google login routes
 router.get( '/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 router.get( '/google/callback',passport.authenticate('google', { session: false }), googleCallback);

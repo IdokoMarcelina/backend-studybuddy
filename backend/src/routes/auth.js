@@ -5,8 +5,8 @@ const {  login, googleCallback, verifyEmailOtp, loginUser, registerWithoutVerify
 const { registerUser } = require('../controllers/authControllers');
 
 
-router.post('/signup', registerUser);
-router.post('/register', registerWithoutVerify);
+router.post('/register', registerUser);
+router.post('/signup', registerWithoutVerify);
 router.post('/login', loginUser);
 router.post('/verify-otp', verifyEmailOtp);
 

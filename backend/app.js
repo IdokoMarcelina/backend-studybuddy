@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const passport = require('passport');
 const connectDB = require('./src/config/db');
+require('./src/config/passport');
 
 require('./src/config/passport');
 

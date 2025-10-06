@@ -121,8 +121,7 @@ exports.loginUser = async (req, res, next) => {
 
 exports.googleCallback = async (req, res, next) => {
   try {
-    const user = req.user; 
-    const token = generateToken(user._id);
+    const { user, token } = req.user;
 
     res.json({
       message: 'Google login successful',
@@ -133,4 +132,5 @@ exports.googleCallback = async (req, res, next) => {
     next(err);
   }
 };
+
 

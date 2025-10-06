@@ -11,7 +11,12 @@ router.post('/login', loginUser);
 router.post('/verify-otp', verifyEmailOtp);
 
 
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-router.get('/google/callback', passport.authenticate('google', { session: false, failureRedirect: '/login' }), googleCallback);
+// ✅ Google login routes
+router.get( '/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+router.get( '/google/callback',passport.authenticate('google', { session: false }), googleCallback);
+
+// router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+// router.get('/google/callback', passport.authenticate('google', { session: false, failureRedirect: '/login' }), googleCallback);
 
 module.exports = router;

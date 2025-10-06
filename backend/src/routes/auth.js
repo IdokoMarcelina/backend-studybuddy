@@ -1,11 +1,12 @@
 const express = require('express');
 const passport = require('passport');
 const router = express.Router();
-const {  login, googleCallback, verifyEmailOtp, loginUser } = require('../controllers/authControllers');
+const {  login, googleCallback, verifyEmailOtp, loginUser, registerWithoutVerify } = require('../controllers/authControllers');
 const { registerUser } = require('../controllers/authControllers');
 
 
 router.post('/signup', registerUser);
+router.post('/register', registerWithoutVerify);
 router.post('/login', loginUser);
 router.post('/verify-otp', verifyEmailOtp);
 

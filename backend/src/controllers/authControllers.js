@@ -38,6 +38,38 @@ exports.registerUser = async (req, res, next) => {
   }
 };
 
+
+exports.registerWithoutVerify = async (req, res, next) => {
+  try {
+    const { username, email, password } = req.body;
+
+    let existingUser = await User.findOne({ email });
+    if (existingUser) return res.status(400).json({ message: 'User already exists' });
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const newUser = await User.create({
+      username,
+      email,
+      password: hashedPassword,
+      isVerified: true, 
+    });
+
+    const token = generateToken(newUser._id);
+
+    res.status(201).json({
+      message: 'User registered successfully (no email verification required)',
+      token,
+      user: newUser,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+
+
 exports.verifyEmailOtp = async (req, res, next) => {
   try {
     const { email, otp } = req.body;

@@ -4,37 +4,95 @@ const { sendEmail } = require('../utils/sendEmail');
 const bcrypt = require('bcryptjs');
 
 
+// exports.registerUser = async (req, res, next) => {
+//   try {
+//     const { username, email, password } = req.body;
+
+//     let user = await User.findOne({ email });
+//     if (user) return res.status(400).json({ message: 'User already exists' });
+
+
+//     const otp = Math.floor(100000 + Math.random() * 900000).toString();
+//     const otpExpires = Date.now() + 10 * 60 * 1000;
+
+//     user = await User.create({
+//       username,
+//       email,
+//       password,
+//       verificationOtp: otp,
+//       verificationOtpExpires: otpExpires,
+//     });
+
+//     await sendEmail({
+//       to: email,
+//       subject: 'Verify your email',
+//       html: `<p>Hello ${username},</p>
+//              <p>Your verification OTP is:</p>
+//              <h2>${otp}</h2>
+//              <p>This OTP will expire in 10 minutes.</p>`,
+//     });
+
+//     res.status(201).json({ message: 'User registered. Please check your email for the OTP.' });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
+
+
+
 exports.registerUser = async (req, res, next) => {
   try {
     const { username, email, password } = req.body;
 
-    let user = await User.findOne({ email });
-    if (user) return res.status(400).json({ message: 'User already exists' });
+    if (!username || !email || !password) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
 
+    let existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const otpExpires = Date.now() + 10 * 60 * 1000;
+    const otpExpires = Date.now() + 10 * 60 * 1000; 
 
-    user = await User.create({
+    const user = await User.create({
       username,
       email,
-      password,
+      password: hashedPassword,
       verificationOtp: otp,
       verificationOtpExpires: otpExpires,
     });
 
-    await sendEmail({
-      to: email,
-      subject: 'Verify your email',
-      html: `<p>Hello ${username},</p>
-             <p>Your verification OTP is:</p>
-             <h2>${otp}</h2>
-             <p>This OTP will expire in 10 minutes.</p>`,
-    });
+    try {
+      await sendEmail({
+        to: email,
+        subject: 'Verify your email',
+        html: `
+          <p>Hello ${username},</p>
+          <p>Your verification OTP is:</p>
+          <h2>${otp}</h2>
+          <p>This OTP will expire in 10 minutes.</p>
+        `,
+      });
+    } catch (emailError) {
+      console.error('Email send error:', emailError.message);
+      return res.status(500).json({
+        message:
+          'User created but failed to send verification email. Please contact support.',
+      });
+    }
 
-    res.status(201).json({ message: 'User registered. Please check your email for the OTP.' });
+    return res.status(201).json({
+      message: 'User registered successfully. Please check your email for the OTP.',
+      email: user.email,
+    });
   } catch (err) {
-    next(err);
+    console.error('Registration error:', err.message);
+    return res.status(500).json({ message: 'Registration failed, please try again.' });
   }
 };
 
